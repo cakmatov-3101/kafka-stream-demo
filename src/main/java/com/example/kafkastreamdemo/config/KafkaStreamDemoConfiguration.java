@@ -1,5 +1,8 @@
 package com.example.kafkastreamdemo.config;
 
+import com.example.kafkastreamdemo.entity.Employee;
+import com.example.kafkastreamdemo.serialization.EmployeeDeserializer;
+import com.example.kafkastreamdemo.serialization.EmployeeSerializer;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -144,6 +147,17 @@ public class KafkaStreamDemoConfiguration {
                 .peek((key, value) -> System.out.println("Joined stream. Key: " + key + ", value: " + value));
 
         return joinedStream;
+    }
+
+
+    @Bean
+    public KStream<String, Employee> serdeTaskStream(StreamsBuilder kStreamBuilder) {
+        KStream<String, Employee> serdeTaskStream = kStreamBuilder
+                .stream(environment.getProperty("task6.topic.name"),
+                        Consumed.with(Serdes.String(), Serdes.serdeFrom(new EmployeeSerializer(), new EmployeeDeserializer())))
+                .peek((key, value) -> System.out.println(value));
+
+        return serdeTaskStream;
     }
 
 
